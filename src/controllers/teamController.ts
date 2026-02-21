@@ -2,14 +2,10 @@ import { Request, Response } from 'express';
 import TeamMember from '../models/TeamMember';
 import { deleteImage, getPublicIdFromUrl } from '../config/cloudinary';
 
-// Extended file type for Cloudinary uploads
 interface CloudinaryFile extends Express.Multer.File {
   path: string;
 }
 
-// @desc    Get all team members
-// @route   GET /api/team
-// @access  Public
 export const getTeamMembers = async (_req: Request, res: Response): Promise<void> => {
   try {
     const members = await TeamMember.findAll({
@@ -31,9 +27,6 @@ export const getTeamMembers = async (_req: Request, res: Response): Promise<void
   }
 };
 
-// @desc    Get single team member
-// @route   GET /api/team/:id
-// @access  Public
 export const getTeamMember = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -54,14 +47,10 @@ export const getTeamMember = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// @desc    Create team member
-// @route   POST /api/team
-// @access  Private (admin only)
 export const createTeamMember = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, role, description, order, isCEO } = req.body;
 
-    // Get image URL from uploaded file
     if (!req.file) {
       res.status(400).json({ success: false, message: 'Image is required' });
       return;
@@ -89,9 +78,6 @@ export const createTeamMember = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// @desc    Update team member
-// @route   PUT /api/team/:id
-// @access  Private (admin only)
 export const updateTeamMember = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -104,12 +90,10 @@ export const updateTeamMember = async (req: Request, res: Response): Promise<voi
 
     const { name, role, description, order, isCEO } = req.body;
 
-    // Check if new image was uploaded
     let image = member.image;
     if (req.file) {
       const file = req.file as CloudinaryFile;
 
-      // Delete old image from Cloudinary
       const oldPublicId = getPublicIdFromUrl(member.image);
       if (oldPublicId) {
         await deleteImage(oldPublicId);
@@ -137,9 +121,6 @@ export const updateTeamMember = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// @desc    Delete team member
-// @route   DELETE /api/team/:id
-// @access  Private (admin only)
 export const deleteTeamMember = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -150,7 +131,6 @@ export const deleteTeamMember = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Delete image from Cloudinary
     const publicId = getPublicIdFromUrl(member.image);
     if (publicId) {
       await deleteImage(publicId);

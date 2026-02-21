@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
 import Message from '../models/Message';
 
-// @desc    Get all messages
-// @route   GET /api/messages
-// @access  Private (admin only)
 export const getMessages = async (_req: Request, res: Response): Promise<void> => {
   try {
     const messages = await Message.findAll({
@@ -21,9 +18,6 @@ export const getMessages = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-// @desc    Get single message
-// @route   GET /api/messages/:id
-// @access  Private (admin only)
 export const getMessage = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -44,9 +38,6 @@ export const getMessage = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// @desc    Update message status (mark as read/unread)
-// @route   PATCH /api/messages/:id
-// @access  Private (admin only)
 export const updateMessageStatus = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -71,9 +62,6 @@ export const updateMessageStatus = async (req: Request, res: Response): Promise<
   }
 };
 
-// @desc    Delete message
-// @route   DELETE /api/messages/:id
-// @access  Private (admin only)
 export const deleteMessage = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;

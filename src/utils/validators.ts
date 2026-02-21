@@ -1,6 +1,5 @@
 import { body, param } from 'express-validator';
 
-// Contact form validators
 export const contactValidators = [
   body('fullName')
     .trim()
@@ -28,7 +27,6 @@ export const contactValidators = [
     .withMessage('Message must be between 10 and 2000 characters'),
 ];
 
-// Auth validators
 export const loginValidators = [
   body('email')
     .trim()
@@ -61,7 +59,6 @@ export const registerValidators = [
     .withMessage('Password must be at least 6 characters'),
 ];
 
-// Add admin validators
 export const addAdminValidators = [
   body('email')
     .trim()
@@ -77,14 +74,12 @@ export const addAdminValidators = [
     .withMessage('Name must be between 2 and 100 characters'),
 ];
 
-// Google login validators
 export const googleLoginValidators = [
   body('credential')
     .notEmpty()
     .withMessage('Google credential token is required'),
 ];
 
-// Project validators
 export const projectValidators = [
   body('title')
     .trim()
@@ -116,7 +111,6 @@ export const projectValidators = [
     .withMessage('Featured must be a boolean'),
 ];
 
-// Team member validators
 export const teamMemberValidators = [
   body('name')
     .trim()
@@ -148,7 +142,6 @@ export const teamMemberValidators = [
     .withMessage('isCEO must be a boolean'),
 ];
 
-// Service validators
 export const serviceValidators = [
   body('title')
     .trim()
@@ -177,14 +170,12 @@ export const serviceValidators = [
     .withMessage('Order must be a non-negative integer'),
 ];
 
-// ID param validator
 export const idParamValidator = [
   param('id')
     .isInt({ min: 1 })
     .withMessage('Invalid ID'),
 ];
 
-// Message status validator
 export const messageStatusValidator = [
   body('isRead')
     .isBoolean()

@@ -2,9 +2,6 @@ import { Request, Response } from 'express';
 import Message from '../models/Message';
 import { sendContactNotification } from '../services/emailService';
 
-// @desc    Submit contact form
-// @route   POST /api/contact
-// @access  Public
 export const submitContact = async (req: Request, res: Response): Promise<void> => {
   try {
     const { fullName, email, phone, message } = req.body;
@@ -16,7 +13,6 @@ export const submitContact = async (req: Request, res: Response): Promise<void> 
       message,
     });
 
-    // Send email notification (don't fail if email fails)
     try {
       await sendContactNotification({ fullName, email, phone, message });
     } catch (emailError) {

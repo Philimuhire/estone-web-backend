@@ -6,9 +6,6 @@ import { generateToken } from '../middlewares/auth';
 const PROTECTED_EMAIL = 'philimuhire@gmail.com';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// @desc    Login admin
-// @route   POST /api/auth/login
-// @access  Public
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
@@ -44,9 +41,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// @desc    Register new admin (protected)
-// @route   POST /api/auth/register
-// @access  Private (admin only)
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email, password } = req.body;
@@ -74,9 +68,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// @desc    Get current admin profile
-// @route   GET /api/auth/me
-// @access  Private
 export const getMe = async (req: Request, res: Response): Promise<void> => {
   try {
     const admin = req.admin;
@@ -100,9 +91,6 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// @desc    Google OAuth login
-// @route   POST /api/auth/google
-// @access  Public
 export const googleLogin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { credential } = req.body;
@@ -125,7 +113,6 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    // Store googleId if not already set
     if (!admin.googleId && payload.sub) {
       await admin.update({ googleId: payload.sub });
     }
@@ -147,9 +134,6 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// @desc    List all admins
-// @route   GET /api/auth/admins
-// @access  Private
 export const listAdmins = async (_req: Request, res: Response): Promise<void> => {
   try {
     const admins = await Admin.findAll({
@@ -163,9 +147,6 @@ export const listAdmins = async (_req: Request, res: Response): Promise<void> =>
   }
 };
 
-// @desc    Add a new admin (Google-only, no password)
-// @route   POST /api/auth/admins
-// @access  Private
 export const addAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, name } = req.body;
@@ -192,9 +173,6 @@ export const addAdmin = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// @desc    Remove an admin
-// @route   DELETE /api/auth/admins/:id
-// @access  Private
 export const removeAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const adminId = req.params.id as string;

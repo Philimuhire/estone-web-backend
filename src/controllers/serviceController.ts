@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
 import Service from '../models/Service';
 
-// @desc    Get all services
-// @route   GET /api/services
-// @access  Public
 export const getServices = async (_req: Request, res: Response): Promise<void> => {
   try {
     const services = await Service.findAll({
@@ -21,9 +18,6 @@ export const getServices = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-// @desc    Get single service
-// @route   GET /api/services/:id
-// @access  Public
 export const getService = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -44,9 +38,6 @@ export const getService = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// @desc    Create service
-// @route   POST /api/services
-// @access  Private (admin only)
 export const createService = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, description, features, icon, order } = req.body;
@@ -69,9 +60,6 @@ export const createService = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// @desc    Update service
-// @route   PUT /api/services/:id
-// @access  Private (admin only)
 export const updateService = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -102,9 +90,6 @@ export const updateService = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// @desc    Delete service
-// @route   DELETE /api/services/:id
-// @access  Private (admin only)
 export const deleteService = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;

@@ -2,14 +2,10 @@ import { Request, Response } from 'express';
 import Project from '../models/Project';
 import { deleteImage, getPublicIdFromUrl } from '../config/cloudinary';
 
-// Extended file type for Cloudinary uploads
 interface CloudinaryFile extends Express.Multer.File {
   path: string;
 }
 
-// @desc    Get all projects
-// @route   GET /api/projects
-// @access  Public
 export const getProjects = async (req: Request, res: Response): Promise<void> => {
   try {
     const { category, featured } = req.query;
@@ -39,9 +35,6 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// @desc    Get single project
-// @route   GET /api/projects/:id
-// @access  Public
 export const getProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -62,24 +55,15 @@ export const getProject = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// @desc    Create project
-// @route   POST /api/projects
-// @access  Private (admin only)
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Debug logging
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
-
     const { title, description, category, location, featured } = req.body;
 
-    // Get image URL from uploaded file
     if (!req.file) {
       res.status(400).json({ success: false, message: 'Image is required' });
       return;
     }
 
-    // Validate required fields
     if (!title || !description || !category || !location) {
       res.status(400).json({
         success: false,
@@ -110,9 +94,6 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// @desc    Update project
-// @route   PUT /api/projects/:id
-// @access  Private (admin only)
 export const updateProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -125,12 +106,10 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
 
     const { title, description, category, location, featured } = req.body;
 
-    // Check if new image was uploaded
     let image = project.image;
     if (req.file) {
       const file = req.file as CloudinaryFile;
 
-      // Delete old image from Cloudinary
       const oldPublicId = getPublicIdFromUrl(project.image);
       if (oldPublicId) {
         await deleteImage(oldPublicId);
@@ -158,9 +137,6 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// @desc    Delete project
-// @route   DELETE /api/projects/:id
-// @access  Private (admin only)
 export const deleteProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
@@ -171,7 +147,6 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Delete image from Cloudinary
     const publicId = getPublicIdFromUrl(project.image);
     if (publicId) {
       await deleteImage(publicId);

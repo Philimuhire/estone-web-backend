@@ -1,14 +1,10 @@
 import { Request, Response } from 'express';
 import { deleteImage, getPublicIdFromUrl } from '../config/cloudinary';
 
-// Extended file type for Cloudinary uploads
 interface CloudinaryFile extends Express.Multer.File {
-  path: string; // Cloudinary URL
+  path: string;
 }
 
-// @desc    Upload image (general)
-// @route   POST /api/upload
-// @access  Private (admin only)
 export const uploadImage = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.file) {
@@ -34,9 +30,6 @@ export const uploadImage = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// @desc    Delete image from Cloudinary
-// @route   DELETE /api/upload
-// @access  Private (admin only)
 export const deleteUploadedImage = async (req: Request, res: Response): Promise<void> => {
   try {
     const { imageUrl } = req.body;
