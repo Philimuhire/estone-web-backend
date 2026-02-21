@@ -21,12 +21,12 @@ const createTransporter = () => {
 
 export const sendContactNotification = async (data: ContactEmailData): Promise<void> => {
   const transporter = createTransporter();
-  const adminEmail = process.env.ADMIN_EMAIL || 'info@escotech.rw';
+  const adminEmail = process.env.ADMIN_EMAIL || 'estonedesigningandcons@gmail.com';
 
   const mailOptions = {
-    from: `"ESCOtech Website" <${process.env.SMTP_USER}>`,
+    from: `"ESTONE Website" <${process.env.SMTP_USER}>`,
     to: adminEmail,
-    subject: `New Contact Form Submission from ${data.fullName}`,
+    subject: `New ESTONE Website Contact Form Submission from ${data.fullName}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px;">
@@ -55,12 +55,12 @@ export const sendContactNotification = async (data: ContactEmailData): Promise<v
         <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
 
         <p style="color: #666; font-size: 12px;">
-          This email was sent from the ESCOtech Ltd website contact form.
+          This email was sent from ESTONE website contact form.
         </p>
       </div>
     `,
     text: `
-      New Contact Form Submission
+      New ESTONE Website Contact Form Submission
 
       Name: ${data.fullName}
       Email: ${data.email}
