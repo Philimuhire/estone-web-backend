@@ -83,7 +83,7 @@ const seedAll = async (): Promise<void> => {
     console.log('\nSeeding Team Members...');
     const teamMembers = await TeamMember.bulkCreate([
       {
-        name: 'Jean Pierre Habimana',
+        name: 'Daniel Ndagijimana',
         role: 'Chief Executive Officer',
         description: 'With over 20 years of experience in civil engineering, Jean Pierre leads ESCOtech with a vision for excellence and innovation in construction.',
         image: '/uploads/team/ceo.jpg',
