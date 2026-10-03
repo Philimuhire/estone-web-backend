@@ -79,6 +79,11 @@ Backend API for ESCOtech Ltd - A Civil Engineering Company Website
 - `GET /api/projects/:id` - Get single project (public)
 - `POST /api/projects` - Create project (admin)
 - `PUT /api/projects/:id` - Update project (admin)
+
+  Create and update accept multipart form data: `image` (the main photo, required on
+  create) and up to 3 `gallery` files. On update, send `keepGallery` as a JSON array of
+  the existing gallery URLs to keep; any left out are deleted. Omit it to leave the
+  gallery as it is.
 - `DELETE /api/projects/:id` - Delete project (admin)
 
 ### Team Members

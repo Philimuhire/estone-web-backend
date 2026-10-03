@@ -6,6 +6,40 @@ interface CloudinaryFile extends Express.Multer.File {
   path: string;
 }
 
+export const MAX_GALLERY_IMAGES = 3;
+
+interface ProjectUploads {
+  image?: CloudinaryFile[];
+  gallery?: CloudinaryFile[];
+}
+
+const getUploads = (req: Request): ProjectUploads => (req.files || {}) as ProjectUploads;
+
+const deleteImages = async (urls: string[]): Promise<void> => {
+  await Promise.all(
+    urls.map((url) => {
+      const publicId = getPublicIdFromUrl(url);
+      return publicId ? deleteImage(publicId) : Promise.resolve();
+    })
+  );
+};
+
+/**
+ * `keepGallery` is a JSON array of the existing gallery URLs the admin left in place.
+ * When it is absent the gallery is left untouched, so older clients that only send
+ * the main image keep working. Unknown URLs are ignored rather than trusted.
+ */
+const parseKeepGallery = (raw: unknown, current: string[]): string[] | null => {
+  if (raw === undefined) return current;
+  try {
+    const parsed: unknown = JSON.parse(String(raw));
+    if (!Array.isArray(parsed)) return null;
+    return current.filter((url) => parsed.includes(url));
+  } catch {
+    return null;
+  }
+};
+
 export const getProjects = async (req: Request, res: Response): Promise<void> => {
   try {
     const { category, featured } = req.query;
@@ -70,13 +104,18 @@ export const getProject = async (req: Request, res: Response): Promise<void> => 
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, description, category, location, featured } = req.body;
+    const uploads = getUploads(req);
+    const imageFile = uploads.image?.[0];
+    const galleryUrls = (uploads.gallery || []).map((file) => file.path);
 
-    if (!req.file) {
+    if (!imageFile) {
+      await deleteImages(galleryUrls);
       res.status(400).json({ success: false, message: 'Image is required' });
       return;
     }
 
     if (!title || !description || !category || !location) {
+      await deleteImages([imageFile.path, ...galleryUrls]);
       res.status(400).json({
         success: false,
         message: 'Please provide title, description, category, and location'
@@ -84,15 +123,13 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const file = req.file as CloudinaryFile;
-    const image = file.path;
-
     const project = await Project.create({
       title,
       description,
       category,
       location,
-      image,
+      image: imageFile.path,
+      gallery: galleryUrls,
       featured: featured === 'true' || featured === true,
     });
 
@@ -116,28 +153,48 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const { title, description, category, location, featured } = req.body;
+    const { title, description, category, location, featured, keepGallery } = req.body;
+    const uploads = getUploads(req);
+    const imageFile = uploads.image?.[0];
+    const newGalleryUrls = (uploads.gallery || []).map((file) => file.path);
+    const newUploads = [...(imageFile ? [imageFile.path] : []), ...newGalleryUrls];
 
-    let image = project.image;
-    if (req.file) {
-      const file = req.file as CloudinaryFile;
+    const currentGallery = project.gallery || [];
+    const keptGallery = parseKeepGallery(keepGallery, currentGallery);
 
-      const oldPublicId = getPublicIdFromUrl(project.image);
-      if (oldPublicId) {
-        await deleteImage(oldPublicId);
-      }
-
-      image = file.path;
+    if (keptGallery === null) {
+      await deleteImages(newUploads);
+      res.status(400).json({ success: false, message: 'keepGallery must be a JSON array of image URLs' });
+      return;
     }
+
+    const gallery = [...keptGallery, ...newGalleryUrls];
+    if (gallery.length > MAX_GALLERY_IMAGES) {
+      await deleteImages(newUploads);
+      res.status(400).json({
+        success: false,
+        message: `A project can have at most ${MAX_GALLERY_IMAGES} gallery images`,
+      });
+      return;
+    }
+
+    const replacedImages = [
+      ...(imageFile ? [project.image] : []),
+      ...currentGallery.filter((url) => !keptGallery.includes(url)),
+    ];
 
     await project.update({
       title: title || project.title,
       description: description || project.description,
       category: category || project.category,
       location: location || project.location,
-      image,
+      image: imageFile ? imageFile.path : project.image,
+      gallery,
       featured: featured !== undefined ? (featured === 'true' || featured === true) : project.featured,
     });
+
+    // Only remove old files once the record no longer points at them.
+    await deleteImages(replacedImages);
 
     res.json({
       success: true,
@@ -159,12 +216,8 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const publicId = getPublicIdFromUrl(project.image);
-    if (publicId) {
-      await deleteImage(publicId);
-    }
-
     await project.destroy();
+    await deleteImages([project.image, ...(project.gallery || [])]);
 
     res.json({
       success: true,

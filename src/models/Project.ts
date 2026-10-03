@@ -10,12 +10,13 @@ interface ProjectAttributes {
   category: ProjectCategory;
   location: string;
   image: string;
+  gallery: string[];
   featured: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id' | 'featured'> {}
+interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id' | 'featured' | 'gallery'> {}
 
 class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implements ProjectAttributes {
   public id!: number;
@@ -24,6 +25,7 @@ class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implem
   public category!: ProjectCategory;
   public location!: string;
   public image!: string;
+  public gallery!: string[];
   public featured!: boolean;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -55,6 +57,12 @@ Project.init(
     image: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    // Extra photos shown on the project page, alongside the main `image`.
+    gallery: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
+      defaultValue: [],
     },
     featured: {
       type: DataTypes.BOOLEAN,
