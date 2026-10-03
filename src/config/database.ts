@@ -8,6 +8,11 @@ const databaseUrl = process.env.DATABASE_URL || 'postgres://localhost:5432/escot
 const sequelize = new Sequelize(databaseUrl, {
   dialect: 'postgres',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  // Cloud Postgres providers (Neon, Render, etc.) require SSL in production.
+  dialectOptions:
+    process.env.NODE_ENV === 'production'
+      ? { ssl: { require: true, rejectUnauthorized: false } }
+      : {},
   pool: {
     max: 20,
     min: 0,
