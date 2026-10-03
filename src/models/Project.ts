@@ -64,6 +64,11 @@ Project.init(
   {
     sequelize,
     tableName: 'projects',
+    indexes: [
+      { fields: ['category'] },
+      { fields: ['featured'] },
+      { fields: ['createdAt'] },
+    ],
   }
 );
 

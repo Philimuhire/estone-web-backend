@@ -13,18 +13,18 @@ export const submitContact = async (req: Request, res: Response): Promise<void> 
       message,
     });
 
-    try {
-      await sendContactNotification({ fullName, email, phone, message });
-    } catch (emailError) {
-      console.error('Failed to send email notification:', emailError);
-    }
-
+    // Respond immediately; send the notification email in the background so the
+    // client isn't blocked waiting on the SMTP server.
     res.status(201).json({
       success: true,
       message: 'Thank you for contacting us. We will get back to you soon.',
       data: {
         id: newMessage.id,
       },
+    });
+
+    sendContactNotification({ fullName, email, phone, message }).catch((emailError) => {
+      console.error('Failed to send email notification:', emailError);
     });
   } catch (error) {
     console.error('Submit contact error:', error);

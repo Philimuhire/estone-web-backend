@@ -19,15 +19,27 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
       where.featured = true;
     }
 
-    const projects = await Project.findAll({
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 100));
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Project.findAndCountAll({
       where,
       order: [['createdAt', 'DESC']],
+      limit,
+      offset,
     });
 
     res.json({
       success: true,
-      count: projects.length,
-      data: projects,
+      count: rows.length,
+      data: rows,
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit),
+      },
     });
   } catch (error) {
     console.error('Get projects error:', error);

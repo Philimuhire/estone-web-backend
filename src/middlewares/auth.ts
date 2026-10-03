@@ -6,6 +6,14 @@ interface JwtPayload {
   id: number;
 }
 
+const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is not set');
+  }
+  return secret;
+};
+
 declare global {
   namespace Express {
     interface Request {
@@ -27,7 +35,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as JwtPayload;
+    const decoded = jwt.verify(token, getJwtSecret()) as JwtPayload;
     const admin = await Admin.findByPk(decoded.id);
 
     if (!admin) {
@@ -43,7 +51,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
 };
 
 export const generateToken = (id: number): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
+  return jwt.sign({ id }, getJwtSecret(), {
     expiresIn: '30d',
   });
 };

@@ -1,5 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
 import morgan from 'morgan';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -20,6 +22,8 @@ const corsOptions = {
 };
 
 // Middleware
+app.use(helmet());
+app.use(compression());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import bcrypt from 'bcryptjs';
+import { hash, compare } from '@node-rs/bcrypt';
 import sequelize from '../config/database';
 
 interface AdminAttributes {
@@ -25,7 +25,7 @@ class Admin extends Model<AdminAttributes, AdminCreationAttributes> implements A
 
   public async comparePassword(candidatePassword: string): Promise<boolean> {
     if (!this.password) return false;
-    return bcrypt.compare(candidatePassword, this.password);
+    return compare(candidatePassword, this.password);
   }
 }
 
@@ -63,14 +63,12 @@ Admin.init(
     hooks: {
       beforeCreate: async (admin: Admin) => {
         if (admin.password) {
-          const salt = await bcrypt.genSalt(10);
-          admin.password = await bcrypt.hash(admin.password, salt);
+          admin.password = await hash(admin.password, 10);
         }
       },
       beforeUpdate: async (admin: Admin) => {
         if (admin.changed('password') && admin.password) {
-          const salt = await bcrypt.genSalt(10);
-          admin.password = await bcrypt.hash(admin.password, salt);
+          admin.password = await hash(admin.password, 10);
         }
       },
     },

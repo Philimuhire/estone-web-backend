@@ -62,6 +62,10 @@ TeamMember.init(
   {
     sequelize,
     tableName: 'team_members',
+    indexes: [
+      { fields: ['isCEO'] },
+      { fields: ['order'] },
+    ],
   }
 );
 

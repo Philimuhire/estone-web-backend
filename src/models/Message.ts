@@ -59,6 +59,10 @@ Message.init(
   {
     sequelize,
     tableName: 'messages',
+    indexes: [
+      { fields: ['createdAt'] },
+      { fields: ['isRead'] },
+    ],
   }
 );
 

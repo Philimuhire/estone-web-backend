@@ -57,6 +57,9 @@ Service.init(
   {
     sequelize,
     tableName: 'services',
+    indexes: [
+      { fields: ['order'] },
+    ],
   }
 );
 

@@ -1,16 +1,28 @@
 import { Request, Response } from 'express';
 import Message from '../models/Message';
 
-export const getMessages = async (_req: Request, res: Response): Promise<void> => {
+export const getMessages = async (req: Request, res: Response): Promise<void> => {
   try {
-    const messages = await Message.findAll({
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 100));
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Message.findAndCountAll({
       order: [['createdAt', 'DESC']],
+      limit,
+      offset,
     });
 
     res.json({
       success: true,
-      count: messages.length,
-      data: messages,
+      count: rows.length,
+      data: rows,
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit),
+      },
     });
   } catch (error) {
     console.error('Get messages error:', error);

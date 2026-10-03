@@ -7,13 +7,14 @@ import {
   deleteProject,
 } from '../controllers/projectController';
 import { protect } from '../middlewares/auth';
+import { publicCache } from '../middlewares/cache';
 import { uploadProject } from '../config/cloudinary';
 
 const router = Router();
 
 // Public routes
-router.get('/', getProjects);
-router.get('/:id', getProject);
+router.get('/', publicCache(60), getProjects);
+router.get('/:id', publicCache(60), getProject);
 
 // Protected routes (admin only) - with image upload
 router.post('/', protect, uploadProject.single('image'), createProject);
